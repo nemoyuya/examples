@@ -59,7 +59,12 @@ def listdir(dir_path):
 
 class customTSNE(object):
     """
-    openTSNEをカスタムしたもの
+    openTSNEをラップしたもの
+    
+    openTSNE
+    インストール： pip install opentsne
+    ライセンス: OSI Approved (BSD-3-Clause)
+    作者：Pavlin Poličar (pavlin.g.p@gmail.com)
     """
     from openTSNE import TSNE
     import numpy as np
@@ -79,6 +84,63 @@ class customTSNE(object):
         openTSNEのtransform
         """
         self.test_emb = self.train_emb.transform(data)
+
+    def plot_train(self, label = None):
+        """
+        matplotlibでのplot
+        """        
+        plt.clf()
+        plt.scatter(self.train_emb[:,0], self.train_emb[:,1], c=label, cmap="winter")
+        plt.show()
+
+    def plot_test(self, label = None):
+        """
+        matplotlibでのplot
+        """        
+        plt.clf()
+        plt.scatter(self.test_emb[:,0], self.test_emb[:,1], c=label, cmap="autumn")
+        plt.show()
+
+    def plot_both(self, train_label = None, test_label = None):
+        """
+        matplotlibでのplot
+        """        
+        plt.clf()
+        plt.scatter(self.train_emb[:,0], self.train_emb[:,1], c=train_label, cmap="winter")
+        plt.scatter(self.test_emb[:,0], self.test_emb[:,1], c=test_label, cmap="autumn")
+        plt.show()
+
+
+
+class customUMAP(object):
+    """
+    umap-learnをラップしたもの
+    
+    umap-learn
+    インストール： pip install opentsne
+    ライセンス: OSI Approved (BSD-3-Clause)
+    作者：Pavlin Poličar (pavlin.g.p@gmail.com)
+    """
+    from umap import UMAP
+    import numpy as np
+    
+    def __init__(self):
+        self.train_emb = None
+        self.test_emb = None
+        self.mapper = UMAP()
+
+    def fit(self, data: np.array):
+        """
+        openTSNEのfit
+        """
+        self.mapper.fit(data)
+        self.train_emb = self.mapper.transform(data)
+
+    def transform(self, data: np.array):
+        """
+        openTSNEのtransform
+        """
+        self.test_emb = self.mapper.transform(data)
 
     def plot_train(self, label = None):
         """
