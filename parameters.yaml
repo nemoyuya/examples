@@ -1,0 +1,16 @@
+data_dir : "data_oscar"
+
+# model params
+embedding_dim : 400
+init_mode: "uniform"
+
+# train params
+model_load_flag : 0
+in_model_path : "model_latest.pth"
+out_model_path : "model_bestloss.pth"
+replace_cluster_num : 128
+epoch_num : 1
+batch_size : 200
+learning_rate : 0.0001
+train_ratio : 0.5
+epoch_offset: 1
