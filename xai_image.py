@@ -51,8 +51,8 @@ def main(cfg):
     img_cls_num = 1000
     
     #base_img_path = ""
-    #base_img_path = "2.jpg"
-    base_img_path = "0_17.png"
+    base_img_path = "2.jpg"
+    #base_img_path = "0_17.png"
     #base_img_path = ""
     
     model = XAI_image(
@@ -67,7 +67,6 @@ def main(cfg):
     )
     
     model.to("cuda")
-    #model = torch.nn.DataParallel(model)
     # ----------------------------
     # Optimizer, loss
     # ----------------------------
@@ -81,15 +80,6 @@ def main(cfg):
     # ----------------------------
     # Training loop
     # ----------------------------
-    loss_per_epch = []
-    matrix_mean = []
-    matrix_mean_epoch = []
-
-    last_i_mat = None
-    best_train_loss = 10000000000
-    best_validation_loss = 10000000000
-    best_validation_accuracy = 0
-    nan_flag = False
 
     train_x = [i for i in range(xai_img_num)]
     train_x = np.array(train_x)
@@ -118,7 +108,6 @@ def main(cfg):
         start = time.time()
         print("Epoch >>>>> ", epoch + epoch_offset)
         
-        #model.train()
         train_loss = 0.
         train_accuracy = 0
         train_total = 0
@@ -137,11 +126,7 @@ def main(cfg):
         for i in range(xai_img_num):
             np_img = np.zeros((model.matrix_size,model.matrix_size,model.channel_size), np.float64)
             np_emb_img = emb_img[i]
-            for c in range(model.channel_size):
-                for x in range(model.matrix_size):
-                    for y in range(model.matrix_size):
-                        #ii = c*model.matrix_size*model.matrix_size + x*model.matrix_size + y
-                        np_img[y,x,c] = np_emb_img[c,y,x]
+            np_img = np_emb_img.to('cpu').detach().numpy().copy().transpose(1,2,0)
             np_img = 255*np_img
             print(np.min(np_img),np.max(np_img))
             np_img = np_img.astype(np.uint8)
@@ -193,19 +178,8 @@ def main(cfg):
         gc.collect()
         torch.cuda.empty_cache() # <-
                 
-        #print("mode1_each", each_label_accuracy, np.sum(np.array(each_label_accuracy)) )
-
         t_loss = (train_loss / train_total)
         print("train (loss)",t_loss)
-
-        if t_loss < best_train_loss:
-            best_train_loss = t_loss
-            # ----------------------------
-            # save model
-            # ----------------------------
-            print(f"model saved as model_best_train.pth")
-            torch.save(model.state_dict(), "model_best_train.pth")
-        torch.save(model.state_dict(), "model_latest.pth")
 
         elapsed_time = time.time() - start
     writer.close()
